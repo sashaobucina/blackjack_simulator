@@ -8,13 +8,17 @@ class PlayerStrategy
       hands = game.player.possible_hands
 
       hands.each do |hand|
-        choices << Choice.new(
-          action: :stay, win_probability: WinProbability.calculate(hand, game.dealer.sum)
-        )
+        if hand < 4
+          choices << Choice.new(action: :stay, win_probability: 0)
+        else
+          choices << Choice.new(
+            action: :stay, win_probability: WinProbability.calculate(hand, game.dealer.sum)
+          )
 
-        choices << Choice.new(
-          action: :hit, win_probability: WinProbability.calculate(hand + game.deck.peek.value, game.dealer.sum)
-        )
+          choices << Choice.new(
+            action: :hit, win_probability: WinProbability.calculate(hand + game.deck.peek.value, game.dealer.sum)
+          )
+        end
       end
 
       best_choice = choices.max_by(&:win_probability)
