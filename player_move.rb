@@ -1,3 +1,4 @@
+# TODO: Implement "splits"
 class PlayerMove
   attr_reader :variant
 

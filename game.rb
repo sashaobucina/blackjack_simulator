@@ -18,11 +18,11 @@ class Game
   end
 
   def deal_to_player
-    @player.cards << @deck.draw
+    @player.hand.add_card(@deck.draw)
   end
 
   def deal_to_dealer
-    @dealer.cards << @deck.draw
+    @dealer.hand.add_card(@deck.draw)
   end
 
   def reset!
@@ -36,6 +36,6 @@ class Game
   end
 
   def to_s
-    "Player: #{player.sum} | Dealer: #{dealer.sum}"
+    "Player: #{player.hand.total} | Dealer: #{dealer.hand.total}"
   end
 end

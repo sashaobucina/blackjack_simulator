@@ -1,43 +1,41 @@
+require_relative "hand"
+
 class Player
-  attr_accessor :cards
+  attr_accessor :hand
 
   def initialize(dealer: false)
-    @cards = []
+    @hand = Hand.new
     @dealer = dealer
   end
 
-  def sum
-    cards.sum(&:value)
-  end
-
-  # TODO: Implement `Hand` class to model possible hands
   def possible_hands
-    sums = [0]
+    hands = [Hand.new]
 
-    cards.each do |card|
+    hand.cards.each do |card|
       if card.ace?
-        sums_with_aces_as_one = sums.map { |sum| sum + 1 }
-        sums_with_aces_as_eleven = sums.map { |sum| sum + 11 }
+        hands.each { |hand| hand.add_card(Card.new(11, "A")) }
+        cloned_hands = hands.map(&:clone)
+        cloned_hands.each { |hand| hand.add_card(Card.new(1, "A")) }
 
-        sums = sums_with_aces_as_one + sums_with_aces_as_eleven
+        hands = hands + cloned_hands
       else
-        sums = sums.map { |sum| sum + card.value }
+        hands.each { |hand| hand.add_card(card) }
       end
     end
 
-    sums
+    hands
   end
 
   def reset!
-    @cards = []
+    hand.reset!
   end
 
   def bust?
-    sum > 21
+    @hand.bust?
   end
 
   def can_hit?
-    player? ? true : sum < 17
+    player? ? true : hand.total < 17
   end
 
   def player?

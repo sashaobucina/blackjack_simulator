@@ -4,25 +4,15 @@ require_relative "win_probability"
 class PlayerStrategy
   class << self
     def next_move(game)
-      choices = []
-      hands = game.player.possible_hands
+      player_hand = game.player.hand
+      dealer_upcard = game.dealer.hand.cards.first
 
-      hands.each do |hand|
-        if hand < 4
-          choices << Choice.new(action: :stay, win_probability: 0)
-        else
-          choices << Choice.new(
-            action: :stay, win_probability: WinProbability.calculate(hand, game.dealer.sum)
-          )
+      choice = Choice.new(
+        hand: player_hand,
+        dealer_upcard: dealer_upcard,
+      )
 
-          choices << Choice.new(
-            action: :hit, win_probability: WinProbability.calculate(hand + game.deck.peek.value, game.dealer.sum)
-          )
-        end
-      end
-
-      best_choice = choices.max_by(&:win_probability)
-      best_choice.move
+      choice.best_move
     end
   end
 end

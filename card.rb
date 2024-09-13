@@ -1,8 +1,9 @@
 class Card
-  attr_reader :value
+  attr_reader :value, :symbol
 
-  def initialize(value)
+  def initialize(value, symbol)
     @value = value
+    @symbol = symbol
   end
 
   def ace?
@@ -10,6 +11,6 @@ class Card
   end
 
   def to_s
-    @value.to_s
+    @symbol
   end
 end
