@@ -9,15 +9,16 @@ class Simulation
 
       num_times.times do
         game_runner = GameRunner.new
+        results = game_runner.run
 
-        win_result = game_runner.run_once
-
-        if win_result.player_won?
-          player_wins += 1
-        elsif win_result.dealer_won?
-          dealer_wins += 1
-        elsif win_result.tie?
-          ties += 1
+        results.each do |result|
+          if result.player_won?
+            player_wins += 1
+          elsif result.dealer_won?
+            dealer_wins += 1
+          elsif result.tie?
+            ties += 1
+          end
         end
       end
 

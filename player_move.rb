@@ -1,4 +1,3 @@
-# TODO: Implement "splits"
 class PlayerMove
   attr_reader :variant
 
@@ -12,6 +11,10 @@ class PlayerMove
 
   def hit?
     variant == :hit
+  end
+
+  def split?
+    variant == :split
   end
 
   def to_s

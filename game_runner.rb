@@ -7,38 +7,68 @@ class GameRunner
     @game = Game.new
   end
 
-  def run_once
+  def run
+    player = @game.player
+    dealer = @game.dealer
+
     @game.deal_to_player
     @game.deal_to_dealer
     @game.deal_to_player
 
-    while !@game.done?
-      move = PlayerStrategy.next_move(@game)
+    queue = []
+    queue << player.hands.first
 
-      if move.stay?
-        while @game.dealer.can_hit?
-          @game.deal_to_dealer
+    while !queue.empty?
+      hand = queue.shift
+
+      while !hand.bust?
+        move = PlayerStrategy.next_move(hand, dealer.upcard)
+
+        if move.split?
+          queue << @game.split_hand(hand)
+        elsif move.hit?
+          @game.deal_to_player(hand: hand)
+        elsif move.stay?
+          break
+        else
+          raise StandardError, "Invalid move: #{move}"
         end
-      elsif move.hit?
-        @game.deal_to_player
-      else
-        raise StandardError, "Invalid move: #{move}"
+
+        if hand.bust? && hand.soft?
+          hand.mark_as_hard!
+        end
       end
     end
 
-    # Calculate who won
-    result = if @game.player.bust?
-      WinResult.new(:dealer)
-    elsif @game.dealer.bust?
-      WinResult.new(:player)
-    elsif @game.player.hand.total > @game.dealer.hand.total
-      WinResult.new(:player)
-    elsif @game.player.hand.total < @game.dealer.hand.total
-      WinResult.new(:dealer)
-    else
-      WinResult.new(:tie)
+    # Dealer's turn if player isn't bust for all their hands
+    unless player.bust?
+      while dealer.can_hit?
+        @game.deal_to_dealer
+
+        if dealer.bust? && dealer.hand.soft?
+          dealer.hand.mark_as_hard!
+        end
+      end
     end
 
-    result
+    results = []
+
+    player.hands.each do |hand|
+      if hand.bust?
+        results << WinResult.new(:dealer)
+      elsif dealer.bust?
+        results << WinResult.new(:player)
+      elsif hand.total > dealer.hand.total
+        results << WinResult.new(:player)
+      elsif hand.total < dealer.hand.total
+        results << WinResult.new(:dealer)
+      else
+        results << WinResult.new(:tie)
+      end
+    end
+
+    @game.reset!
+
+    results
   end
 end
