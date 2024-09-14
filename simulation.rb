@@ -32,3 +32,9 @@ class Simulation
     end
   end
 end
+
+num_times = ARGV.empty? ? 1000 : ARGV[0].to_i
+
+puts "Running #{num_times} game simulations..."
+
+Simulation.run(num_times: num_times)
